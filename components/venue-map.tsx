@@ -82,20 +82,16 @@ export default function VenueMap() {
 
           <div className="mt-6 text-center px-4">
             <h3 className="text-xl sm:text-2xl font-serif font-medium text-foreground mb-2">
-              {isRTL ? 'قاعة ليالتي' : 'Laylaty Hall'}
+              {isRTL ? 'قاعة ليلتي' : 'Laylaty Hall'}
             </h3>
             <div className="text-muted-foreground text-sm sm:text-base mb-3 space-y-1">
               {isRTL ? (
                 <>
-                  <div>قاعة ليالتي</div>
                   <div>طلخا، الدقهلية</div>
-                  <div>المنصورة، مصر</div>
                 </>
               ) : (
                 <>
-                  <div>Laylaty Hall</div>
                   <div>Talkha, Dakahlia</div>
-                  <div>Mansoura, Egypt</div>
                 </>
               )}
             </div>

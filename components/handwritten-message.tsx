@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -38,76 +38,70 @@ export default function HandwrittenMessage() {
     { width: 8, name: t('widthBold') },
   ];
 
-  // Initialize canvas
+  // Re-initialize canvas and context when messageType changes back to 'drawn'
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (messageType !== 'drawn') return;
 
-    // Set canvas size
-    const setCanvasSize = (isInitial = false) => {
+    const initCanvas = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const context = canvas.getContext('2d');
+      if (!context) return;
+
+      // Set canvas size based on container
       const container = canvas.parentElement;
       if (container) {
         const rect = container.getBoundingClientRect();
-        const width = Math.min(1000, rect.width * 0.95); // Increased max width
-        // Only update canvas dimensions if they actually changed significantly
-        if (Math.abs(canvas.width - width) > 5 || canvas.height !== 600) {
-          canvas.width = width;
-          canvas.height = 600; // Increased height for larger writing area
-        }
-        canvas.style.border = '2px solid #e5e7eb';
-        canvas.style.borderRadius = '0.5rem';
-        // Only fill background on initial setup, not on resize
-        if (isInitial) {
-          canvas.style.backgroundColor = 'white';
+        canvas.width = Math.min(1000, rect.width * 0.95);
+        canvas.height = 600;
+      }
+
+      // Restore background
+      context.fillStyle = 'white';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Restore drawing styles
+      context.lineWidth = currentWidth;
+      context.lineCap = 'round';
+      context.lineJoin = 'round';
+      context.strokeStyle = currentColor;
+
+      // Restore last state from history if it exists
+      if (history.length > 0) {
+        const img = new Image();
+        img.onload = () => {
+          context.drawImage(img, 0, 0);
+        };
+        img.src = history[history.length - 1];
+      }
+
+      setCtx(context);
+    };
+
+    // Use a small timeout to ensure DOM is ready after mode switch
+    const timer = setTimeout(initCanvas, 50);
+
+    const handleResize = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const container = canvas.parentElement;
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        const newWidth = Math.min(1000, rect.width * 0.95);
+        if (Math.abs(canvas.width - newWidth) > 10) {
+          // Note: Simple resize clears canvas, but initCanvas/history handles restoration
+          initCanvas();
         }
       }
     };
-
-    const context = canvas.getContext('2d');
-    if (!context) return;
-
-    // Set initial drawing styles
-    context.lineWidth = currentWidth;
-    context.lineCap = 'round';
-    context.lineJoin = 'round';
-    context.strokeStyle = currentColor;
-    // Only fill background on initial setup
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    setCtx(context);
-    setCanvasSize(true); // Initial setup
-
-    const handleResize = () => setCanvasSize(false); // Resize without clearing
     window.addEventListener('resize', handleResize);
 
-    // Debounced scroll handler to prevent excessive canvas operations
-    let scrollTimeout: NodeJS.Timeout;
-    const handleScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        // Check if canvas size needs adjustment after scroll
-        const container = canvas.parentElement;
-        if (container) {
-          const rect = container.getBoundingClientRect();
-          const currentWidth = canvas.width;
-          const newWidth = Math.min(1000, rect.width * 0.95);
-          // Only resize if the width actually changed significantly
-          if (Math.abs(currentWidth - newWidth) > 10) {
-            setCanvasSize(false);
-          }
-        }
-      }, 100); // Debounce scroll events
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
     };
-  }, []);
+  }, [messageType]); // Only depends on messageType to trigger re-init
 
   // Update drawing context when color or width changes
   useEffect(() => {
@@ -541,7 +535,7 @@ export default function HandwrittenMessage() {
     >
       <div className="max-w-4xl mx-auto w-full"> {/* Increased max width */}
         <motion.div 
-          className="text-center mb-8 select-none"
+          className="text-center mb-12 select-none"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -557,217 +551,207 @@ export default function HandwrittenMessage() {
             }
           }}
         >
-          <h2 className="text-3xl md:text-4xl font-serif font-medium mb-2 select-none">{t('writeUsMessage')}</h2>
-          <p className="text-gray-600 text-center mb-4 select-none">{t('writeUsDescription')}</p>
-          <div className="w-20 h-1 bg-accent mx-auto mb-6 select-none"></div>
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <svg className="w-6 h-6 text-accent" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </motion.div>
+            <div className="w-24 h-px bg-gradient-to-l from-transparent via-accent to-transparent" />
+          </div>
+          <h2 className="font-heading text-5xl md:text-6xl lg:text-7xl font-medium mb-4 select-none">{t('writeUsMessage')}</h2>
+          <p className="font-luxury text-xl md:text-2xl text-muted-foreground mb-8 italic max-w-2xl mx-auto select-none">{t('writeUsDescription')}</p>
           
-                    <div className="bg-card p-4 sm:p-6 md:p-8 rounded-lg shadow-lg select-none pb-6 sm:pb-8">
-            {/* Message Type Tabs - Prominent Button Style */}
-            <div className="flex gap-4 mb-8 justify-center">
-              <button
-                type="button"
-                onClick={() => setMessageType('drawn')}
-                className={`px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 ${
-                  messageType === 'drawn'
-                    ? 'bg-accent text-white border-2 border-accent'
-                    : 'bg-gray-100 text-gray-700 border-2 border-gray-300 hover:bg-gray-200'
-                }`}
-              >
-                {t('drawnMessage')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setMessageType('written')}
-                className={`px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 ${
-                  messageType === 'written'
-                    ? 'bg-accent text-white border-2 border-accent'
-                    : 'bg-gray-100 text-gray-700 border-2 border-gray-300 hover:bg-gray-200'
-                }`}
-              >
-                {t('writtenMessage')}
-              </button>
-            </div>
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-gradient-to-br from-card/95 via-card/90 to-accent/10 backdrop-blur-sm border-4 border-accent/40 p-6 sm:p-8 md:p-10 rounded-3xl shadow-2xl select-none relative overflow-hidden">
+              {/* Decorative corner accents */}
+              <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-accent/20 rounded-tl-3xl pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-accent/20 rounded-br-3xl pointer-events-none" />
+              
+              {/* Message Type Tabs */}
+              <div className="flex gap-4 mb-10 justify-center relative z-10">
+                <button
+                  type="button"
+                  onClick={() => setMessageType('drawn')}
+                  className={`px-6 py-3 text-base md:text-lg font-luxury rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 border-2 ${
+                    messageType === 'drawn'
+                      ? 'bg-accent text-white border-accent'
+                      : 'bg-background/50 text-foreground border-accent/30 hover:border-accent/60'
+                  }`}
+                >
+                  {t('drawnMessage')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMessageType('written')}
+                  className={`px-6 py-3 text-base md:text-lg font-luxury rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 border-2 ${
+                    messageType === 'written'
+                      ? 'bg-accent text-white border-accent'
+                      : 'bg-background/50 text-foreground border-accent/30 hover:border-accent/60'
+                  }`}
+                >
+                  {t('writtenMessage')}
+                </button>
+              </div>
 
-            {/* Drawn Message Section */}
-            {messageType === 'drawn' && (
-              <>
-                <p className="text-gray-700 text-lg md:text-xl leading-relaxed mb-6 select-none">
-                  {t('yourMessage')}...
-                </p>
-                
-                {/* Pen Options */}
-                <div className="mb-6">
-                  <div className="flex flex-wrap gap-4 justify-center mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">{t('color')}:</span>
-                      <div className="flex gap-1">
-                        {penColors.map((pen) => (
-                          <button
-                            key={pen.color}
-                            type="button"
-                            onClick={() => setCurrentColor(pen.color)}
-                            className={`w-8 h-8 rounded-full border-2 ${
-                              currentColor === pen.color ? 'border-gray-800' : 'border-gray-300'
-                            }`}
-                            style={{ backgroundColor: pen.color }}
-                            title={pen.name}
-                          />
-                        ))}
+              {/* Drawn Message Section */}
+              {messageType === 'drawn' && (
+                <div className="relative z-10">
+                  <p className="font-luxury text-lg text-muted-foreground italic mb-6 select-none">
+                    {t('yourMessage')}...
+                  </p>
+                  
+                  {/* Pen Options */}
+                  <div className="mb-8 p-4 bg-background/40 backdrop-blur-sm rounded-2xl border border-accent/20">
+                    <div className="flex flex-wrap gap-6 justify-center">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-luxury text-foreground/70">{t('color')}:</span>
+                        <div className="flex gap-2">
+                          {penColors.map((pen) => (
+                            <button
+                              key={pen.color}
+                              type="button"
+                              onClick={() => setCurrentColor(pen.color)}
+                              className={`w-7 h-7 rounded-full transition-transform hover:scale-125 border-2 ${
+                                currentColor === pen.color ? 'border-accent scale-110 shadow-md' : 'border-transparent'
+                              }`}
+                              style={{ backgroundColor: pen.color }}
+                              title={pen.name}
+                            />
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">{t('width')}:</span>
-                      <div className="flex gap-2">
-                        {penWidths.map((pen) => (
-                          <button
-                            key={pen.width}
-                            type="button"
-                            onClick={() => setCurrentWidth(pen.width)}
-                            className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                              currentWidth === pen.width
-                                ? 'bg-accent text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            {pen.name}
-                          </button>
-                        ))}
+                      
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-luxury text-foreground/70">{t('width')}:</span>
+                        <div className="flex gap-2">
+                          {penWidths.map((pen) => (
+                            <button
+                              key={pen.width}
+                              type="button"
+                              onClick={() => setCurrentWidth(pen.width)}
+                              className={`px-3 py-1 text-xs font-luxury rounded-full transition-all ${
+                                currentWidth === pen.width
+                                  ? 'bg-accent text-white shadow-sm'
+                                  : 'bg-background/60 text-foreground/70 hover:bg-accent/10 border border-accent/20'
+                              }`}
+                            >
+                              {pen.name}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
                   
-                  {/* Current Tool Display */}
-                  <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-4 h-4 rounded-full border border-gray-300"
-                        style={{ backgroundColor: currentColor }}
-                      />
-                      <span>{t('current')}: {penColors.find(p => p.color === currentColor)?.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="bg-gray-800 rounded-full"
-                        style={{ 
-                          width: currentWidth * 2, 
-                          height: currentWidth * 2 
-                        }}
-                      />
-                      <span>{t('size')}: {penWidths.find(p => p.width === currentWidth)?.name}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div 
-                  className="relative border-2 border-gray-200 rounded-lg overflow-hidden mb-6 select-none"
-                  style={{
-                    WebkitUserSelect: 'none',
-                    userSelect: 'none',
-                    WebkitTapHighlightColor: 'rgba(0,0,0,0)'
-                  }}
-                >
-                  <canvas
-                    ref={canvasRef}
-                    onMouseDown={startDrawing}
-                    onMouseMove={draw}
-                    onMouseUp={stopDrawing}
-                    onMouseLeave={stopDrawing}
-                    onTouchStart={startDrawing}
-                    onTouchMove={draw}
-                    onTouchEnd={stopDrawing}
-                    onTouchCancel={stopDrawing}
-                    className="w-full h-[500px] bg-white touch-none cursor-crosshair select-none"
+                  <div 
+                    className="relative bg-white border-4 border-accent/30 rounded-2xl overflow-hidden mb-8 shadow-inner select-none"
                     style={{
-                      touchAction: 'none',
                       WebkitUserSelect: 'none',
                       userSelect: 'none',
                       WebkitTapHighlightColor: 'rgba(0,0,0,0)'
                     }}
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Written Message Section */}
-            {messageType === 'written' && (
-              <div className="mb-6">
-                <textarea
-                  value={writtenText}
-                  onChange={(e) => setWrittenText(e.target.value)}
-                  placeholder={t('writeYourMessage')}
-                  rows={8}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-transparent resize-none"
-                  required={messageType === 'written'}
-                />
-              </div>
-            )}
-
-            <form onSubmit={sendEmail} className="space-y-4">
-              <div className="mb-4">
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={t('yourName')}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-transparent"
-                  required
-                />
-                <p className="text-sm text-gray-500 mt-2">{t('writeUsDescription')}</p>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-2 pb-2">
-                {messageType === 'drawn' && (
-                  <div className="flex gap-2 flex-wrap w-full sm:w-auto">
-                    <button
-                      type="button"
-                      onClick={undoLastStroke}
-                      className="flex-1 sm:flex-none min-w-0 px-3 sm:px-6 py-2.5 sm:py-3 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors font-medium disabled:opacity-50 text-xs sm:text-base"
-                      disabled={isSending || history.length === 0}
-                    >
-                      {t('undo')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={clearCanvas}
-                      className="flex-1 sm:flex-none min-w-0 px-3 sm:px-6 py-2.5 sm:py-3 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors font-medium text-xs sm:text-base"
-                      disabled={isSending}
-                    >
-                      {t('clearDrawing')}
-                    </button>
+                  >
+                    <canvas
+                      ref={canvasRef}
+                      onMouseDown={startDrawing}
+                      onMouseMove={draw}
+                      onMouseUp={stopDrawing}
+                      onMouseLeave={stopDrawing}
+                      onTouchStart={startDrawing}
+                      onTouchMove={draw}
+                      onTouchEnd={stopDrawing}
+                      onTouchCancel={stopDrawing}
+                      className="w-full h-[400px] touch-none cursor-crosshair select-none"
+                      style={{
+                        touchAction: 'none',
+                        WebkitUserSelect: 'none',
+                        userSelect: 'none',
+                        WebkitTapHighlightColor: 'rgba(0,0,0,0)'
+                      }}
+                    />
                   </div>
-                )}
-                {messageType === 'written' && (
-                  <div className="flex gap-2 w-full sm:w-auto">
-                    <button
-                      type="button"
-                      onClick={() => setWrittenText('')}
-                      className="flex-1 sm:flex-none min-w-0 px-3 sm:px-6 py-2.5 sm:py-3 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors font-medium text-xs sm:text-base"
-                      disabled={isSending || !writtenText.trim()}
-                    >
-                      {t('clearDrawing')}
-                    </button>
-                  </div>
-                )}
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto px-4 sm:px-8 py-2.5 sm:py-3 text-white bg-accent rounded-md hover:bg-accent/90 disabled:opacity-50 transition-colors font-medium text-sm sm:text-base whitespace-nowrap"
-                  disabled={isSending}
-                >
-                  {isSending ? t('sendingMessage') : t('sendMessage')}
-                </button>
-              </div>
-
-              {message.text && (
-                <div className={`mt-6 p-4 rounded-md text-center ${
-                  message.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 
-                  message.type === 'info' ? 'bg-blue-100 text-blue-700 border border-blue-200' : 
-                  'bg-green-100 text-green-700 border border-green-200'
-                }`}>
-                  {message.text}
                 </div>
               )}
-            </form>
+
+              {/* Written Message Section */}
+              {messageType === 'written' && (
+                <div className="mb-8 relative z-10">
+                  <textarea
+                    value={writtenText}
+                    onChange={(e) => setWrittenText(e.target.value)}
+                    placeholder={t('writeYourMessage')}
+                    rows={8}
+                    className="w-full px-6 py-4 bg-background/50 border-2 border-accent/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all font-luxury text-lg resize-none shadow-inner"
+                    required={messageType === 'written'}
+                  />
+                </div>
+              )}
+
+              <form onSubmit={sendEmail} className="space-y-6 relative z-10">
+                <div>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder={t('yourName')}
+                    className="w-full px-6 py-4 bg-background/50 border-2 border-accent/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all font-luxury text-lg shadow-inner"
+                    required
+                  />
+                </div>
+                
+                <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 pt-4">
+                  <div className="flex gap-2">
+                    {(messageType === 'drawn' || (messageType === 'written' && writtenText.trim())) && (
+                      <button
+                        type="button"
+                        onClick={messageType === 'drawn' ? undoLastStroke : () => setWrittenText('')}
+                        className="flex-1 sm:flex-none px-6 py-3 font-luxury text-sm bg-background/60 text-foreground/70 border-2 border-accent/20 rounded-full hover:bg-accent/10 transition-all disabled:opacity-50"
+                        disabled={isSending || (messageType === 'drawn' && history.length === 0)}
+                      >
+                        {messageType === 'drawn' ? t('undo') : t('clearDrawing')}
+                      </button>
+                    )}
+                    {messageType === 'drawn' && (
+                      <button
+                        type="button"
+                        onClick={clearCanvas}
+                        className="flex-1 sm:flex-none px-6 py-3 font-luxury text-sm bg-background/60 text-foreground/70 border-2 border-accent/20 rounded-full hover:bg-accent/10 transition-all"
+                        disabled={isSending}
+                      >
+                        {t('clearDrawing')}
+                      </button>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto px-10 py-4 text-white bg-accent rounded-full hover:bg-accent/90 disabled:opacity-50 transition-all font-luxury text-lg font-medium shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 whitespace-nowrap"
+                    disabled={isSending}
+                  >
+                    {isSending ? t('sendingMessage') : t('sendMessage')}
+                  </button>
+                </div>
+
+                {message.text && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className={`mt-6 p-4 rounded-2xl text-center font-luxury border-2 ${
+                      message.type === 'error' ? 'bg-red-50/80 text-red-700 border-red-200' : 
+                      message.type === 'info' ? 'bg-blue-50/80 text-blue-700 border-blue-200' : 
+                      'bg-green-50/80 text-green-700 border-green-200'
+                    }`}
+                  >
+                    {message.text}
+                  </motion.div>
+                )}
+              </form>
+            </div>
           </div>
         </motion.div>
       </div>

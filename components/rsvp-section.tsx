@@ -204,7 +204,7 @@ export default function RSVPSection() {
             <div className="w-24 h-px bg-gradient-to-l from-transparent via-accent to-accent" />
           </motion.div>
 
-          <h2 className="font-luxury text-4xl md:text-5xl lg:text-6xl text-foreground mb-4 tracking-wide">{t('rsvpTitle')}</h2>
+          <h2 className="font-heading font-luxury text-4xl md:text-5xl lg:text-6xl text-foreground mb-4 tracking-wide">{t('rsvpTitle')}</h2>
           <p className="font-luxury text-lg md:text-xl text-muted-foreground mb-8 italic max-w-2xl mx-auto">{t('rsvpDescription')}</p>
         </motion.div>
         

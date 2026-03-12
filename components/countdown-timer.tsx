@@ -67,40 +67,26 @@ const CountdownTimer = memo(function CountdownTimer({ targetDate }: CountdownTim
   ], [timeLeft.days, timeLeft.hours, timeLeft.minutes, timeLeft.seconds])
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+    <div className="flex flex-nowrap md:grid md:grid-cols-4 gap-2 md:gap-8 overflow-x-auto pb-4 md:pb-0 scrollbar-hide justify-center">
       {timeUnits.map((unit, index) => (
         <div
           key={unit.key}
-          className="group relative"
+          className="group relative flex-shrink-0 w-[85px] h-[100px] md:w-full md:h-auto"
           style={{
             animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
           }}
         >
           {/* Unique hexagonal/diamond-inspired shape with diagonal cuts */}
-          <div className="relative flex flex-col items-center justify-center p-8 md:p-10 bg-gradient-to-br from-card via-card/95 to-accent/10 backdrop-blur-sm border-2 border-accent/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:border-accent/60 hover:scale-105"
+          <div className="relative flex flex-col items-center justify-center h-full bg-gradient-to-br from-card via-card/95 to-accent/10 backdrop-blur-sm border border-accent/30 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 md:p-10"
             style={{ 
               willChange: 'transform',
               clipPath: 'polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%)',
             }}
           >
-            {/* Decorative corner accents */}
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-accent/40" 
-              style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}
-            />
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-accent/40"
-              style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}
-            />
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-accent/40"
-              style={{ clipPath: 'polygon(0 0, 0 100%, 100% 100%)' }}
-            />
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-accent/40"
-              style={{ clipPath: 'polygon(0 100%, 100% 0, 100% 100%)' }}
-            />
-
-            <div className="text-6xl md:text-7xl lg:text-8xl font-serif text-accent font-bold tracking-tight drop-shadow-lg" style={{ willChange: 'contents' }}>
+            <div className="text-3xl md:text-7xl lg:text-8xl font-serif text-accent font-bold tracking-tight drop-shadow-md md:drop-shadow-lg" style={{ willChange: 'contents' }}>
               {unit.value.toString().padStart(2, "0")}
             </div>
-            <div className="text-xs md:text-sm text-muted-foreground mt-4 uppercase tracking-widest font-semibold border-t-2 border-accent/20 pt-3 w-full text-center">
+            <div className="text-[10px] md:text-sm text-muted-foreground mt-1 md:mt-4 uppercase tracking-[0.1em] md:tracking-widest font-semibold border-t border-accent/20 pt-1 md:pt-3 w-[80%] md:w-full text-center">
               {t(unit.key as any)}
             </div>
           </div>

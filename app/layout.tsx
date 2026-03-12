@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
-import { Playfair_Display } from "next/font/google"
+import { Great_Vibes, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { RomanticAudio } from "@/components/romantic-audio"
@@ -14,6 +14,13 @@ import "./globals.css"
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
+  display: "swap",
+})
+
+const greatVibes = Great_Vibes({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-great-vibes",
   display: "swap",
 })
 
@@ -99,6 +106,12 @@ export default function RootLayout({
           as="video"
           type="video/mp4"
         />
+        <link
+          rel="preload"
+          href="/invitation-design.mp4"
+          as="video"
+          type="video/mp4"
+        />
         {/* Preconnect to domains for faster loading */}
         <link rel="preconnect" href="https://maps.googleapis.com" />
         <link rel="preconnect" href="https://maps.gstatic.com" />
@@ -109,7 +122,7 @@ export default function RootLayout({
           as="style"
         />
       </head>
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${playfair.variable}`}>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${playfair.variable} ${greatVibes.variable}`}>
         <LanguageProvider>
           <Suspense fallback={null}>
             <LanguageToggle />

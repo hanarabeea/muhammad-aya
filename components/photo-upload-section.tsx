@@ -138,7 +138,7 @@ export default function PhotoUploadSection() {
             />
           </motion.div>
           <motion.h2
-            className="font-luxury text-5xl md:text-6xl lg:text-7xl text-foreground leading-tight mb-4 tracking-wide"
+            className="font-heading font-luxury text-5xl md:text-6xl lg:text-7xl text-foreground leading-tight mb-4 tracking-wide"
             variants={flyFromRight}
           >
             {t('sharePhotosTitle')}

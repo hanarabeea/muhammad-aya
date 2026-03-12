@@ -1,13 +1,16 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
 import CountdownTimer from "@/components/countdown-timer"
 import VenueMap from "@/components/venue-map"
 import HandwrittenMessage from '@/components/handwritten-message';
+import { useTranslation } from '@/lib/translations';
 
 
 export default function EngagementPage() {
   const [mounted, setMounted] = useState(false)
+  const t = useTranslation()
 
   useEffect(() => {
     setMounted(true)
@@ -17,25 +20,57 @@ export default function EngagementPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="relative flex items-center justify-center px-4 py-8 md:py-12">
-        <div className="w-full max-w-md mx-auto">
-          <video
-            src="/invitation-design.mp4"
-            className="w-full h-auto"
-            autoPlay
-            muted
-            playsInline
-            poster="/invitation-design.png"
-          />
-        </div>
+      <section style={{ height: '100dvh', width: '100vw', position: 'relative', backgroundColor: 'black', overflow: 'hidden' }}>
+        <video
+          src="/invitation-design.mp4"
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
+          autoPlay
+          muted
+          playsInline
+          poster="/invitation-design.png?v=2"
+        />
+
+        {/* Minimal Scroll Down Indicator - Center bottom */}
+        <motion.button
+          onClick={() => {
+            const countdownSection = document.querySelector('section[class*="py-16"]') || document.querySelector('section[style*="countdown-bg.jpg"]');
+            countdownSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 cursor-pointer group"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2, duration: 1 }}
+        >
+          <span className="text-[11px] uppercase tracking-[0.3em] text-white font-bold drop-shadow-md mb-1">
+            Scroll
+          </span>
+          <motion.div
+            animate={{ y: [0, 5, 0] }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="text-white drop-shadow-md group-hover:scale-110 transition-transform"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          </motion.div>
+        </motion.button>
       </section>
 
       <section className="relative py-16 px-4 md:py-24 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-background to-accent/5" />
-        <div className="absolute top-10 left-10 w-32 h-32 bg-accent/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/10 rounded-full blur-3xl" />
-
         <div className="relative max-w-5xl mx-auto">
           <div className="text-center space-y-8 mb-12">
             <div className="inline-block">
@@ -119,12 +154,30 @@ export default function EngagementPage() {
 
 
       <footer className="relative py-16 text-center border-t border-accent/10">
-        <div className="max-w-2xl mx-auto px-4 space-y-4">
+        <div className="max-w-2xl mx-auto px-4 space-y-6">
           <p className="font-serif text-2xl md:text-3xl text-foreground italic">It was always you ♥️</p>
           <div className="flex items-center justify-center gap-2 text-accent">
             <div className="w-8 h-px bg-accent/30" />
             <span className="text-2xl">♥</span>
             <div className="w-8 h-px bg-accent/30" />
+          </div>
+          
+          <div className="pt-8 flex flex-row items-center justify-center gap-2">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-light whitespace-nowrap">
+              {t('madeBy')}
+            </span>
+            <a 
+              href="https://www.instagram.com/digitiva.co?igsh=MXNteGgyZjIzenQwaQ==" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="transition-all duration-300 hover:scale-105"
+            >
+              <img 
+                src="/digitiva.png" 
+                alt="Digitiva Logo" 
+                className="h-16 w-auto"
+              />
+            </a>
           </div>
         </div>
       </footer>

@@ -22,6 +22,10 @@
     font-family: 'Cormorant Garamond', serif;
     letter-spacing: 0.02em;
   }
+
+  .font-heading {
+    font-family: var(--font-heading), cursive;
+  }
   
   .font-elegant {
     font-family: 'Cinzel', serif;
@@ -51,6 +55,14 @@
     animation: shimmer 3s infinite;
   }
   
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
   @keyframes shimmer {
     to {
       left: 100%;
@@ -59,81 +71,72 @@
 }
 
 :root {
-  /* White and darker white palette with grey/black text */
-  --background: #ffffff; /* Pure white */
-  --foreground: #333333;   /* Dark grey text */
-  --card: #f8f8f8;         /* Lighter grey for sections/cards */
-  --card-foreground: #333333;
-  --popover: #f5f5f5;
-  --popover-foreground: #333333;
-  --primary: #666666;    /* Medium grey primary */
-  --primary-foreground: #ffffff; /* White text on primary */
-  --secondary: #f0f0f0;   /* Light grey for alternative sections */
-  --secondary-foreground: #333333;
-  --muted: #f2f2f2;     /* Very light grey for subtle areas */
-  --muted-foreground: #666666;
-  --accent: #999999;      /* Light grey accent */
+  /* Green and Grey mix palette */
+  --background: #fdfdfd;    /* Very light grey background */
+  --foreground: #2d3436;    /* Deep grey for text */
+  --card: #f4f7f4;         /* Soft grey-green for cards */
+  --card-foreground: #2d3436;
+  --popover: #f4f7f4;
+  --popover-foreground: #2d3436;
+  --primary: #4a554a;       /* Dark slate green for primary actions */
+  --primary-foreground: #ffffff;
+  --secondary: #e2e8e2;     /* Light grey-green */
+  --secondary-foreground: #4a554a;
+  --muted: #edf2ed;
+  --muted-foreground: #636e72; /* Medium grey for muted text */
+  --accent: #86967e;        /* The existing Sage Green */
   --accent-foreground: #ffffff;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #666666;
+  --border: #d1d8d1;        /* Sage-tinted grey border */
+  --input: #d1d8d1;
+  --ring: #94B882;
   --radius: 0.5rem;
-  --sidebar: #f5f5f5;
-  --sidebar-foreground: #333333;
-  --sidebar-primary: #666666;
+  --sidebar: #f4f7f4;
+  --sidebar-foreground: #2d3436;
+  --sidebar-primary: #4a554a;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0f0f0;
-  --sidebar-accent-foreground: #333333;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #666666;
-  --chart-1: #f0f0f0;   /* light grey */
-  --chart-2: #e5e5e5;     /* medium light grey */
-  --chart-3: #d4d4d4;     /* medium grey */
-  --chart-4: #a8a8a8;     /* darker grey */
-  --chart-5: #8c8c8c;     /* dark grey accent */
+  --sidebar-accent: #e2e8e2;
+  --sidebar-accent-foreground: #4a554a;
+  --sidebar-border: #d1d8d1;
+  --sidebar-ring: #94B882;
 }
 
 .dark {
-  --background: #1a1a1a;
-  --foreground: #e5e5e5;
-  --card: #2d2d2d;
-  --card-foreground: #e5e5e5;
-  --popover: #2d2d2d;
-  --popover-foreground: #e5e5e5;
-  --primary: #666666;
-  --primary-foreground: #ffffff;
-  --secondary: #404040;
-  --secondary-foreground: #e5e5e5;
-  --muted: #404040;
-  --muted-foreground: #a8a8a8;
-  --accent: #666666;
-  --accent-foreground: #ffffff;
+  --background: #1a1c1a;    /* Very dark grey-green */
+  --foreground: #e2e8e2;    /* Light grey-green text */
+  --card: #242924;
+  --card-foreground: #e2e8e2;
+  --popover: #242924;
+  --popover-foreground: #e2e8e2;
+  --primary: #94B882;       /* Sage Green becomes primary in dark mode */
+  --primary-foreground: #1a1c1a;
+  --secondary: #2d342d;
+  --secondary-foreground: #94B882;
+  --muted: #2d342d;
+  --muted-foreground: #a0aaa0;
+  --accent: #94B882;
+  --accent-foreground: #1a1c1a;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #404040;
-  --input: #404040;
-  --ring: #666666;
-  --chart-1: #8b8b8b;
-  --chart-2: #a8a8a8;
-  --chart-3: #c4c4c4;
-  --chart-4: #d4d4d4;
-  --chart-5: #e5e5e5;
-  --sidebar: #2d2d2d;
-  --sidebar-foreground: #e5e5e5;
-  --sidebar-primary: #666666;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #404040;
-  --sidebar-accent-foreground: #e5e5e5;
-  --sidebar-border: #404040;
-  --sidebar-ring: #666666;
+  --border: #384238;
+  --input: #384238;
+  --ring: #94B882;
+  --sidebar: #242924;
+  --sidebar-foreground: #e2e8e2;
+  --sidebar-primary: #94B882;
+  --sidebar-primary-foreground: #1a1c1a;
+  --sidebar-accent: #2d342d;
+  --sidebar-accent-foreground: #94B882;
+  --sidebar-border: #384238;
+  --sidebar-ring: #94B882;
 }
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: "Playfair Display", serif;
+  --font-heading: var(--font-great-vibes);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

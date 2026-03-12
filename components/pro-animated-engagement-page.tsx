@@ -201,8 +201,10 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
   const [gifHasPlayed, setGifHasPlayed] = useState(false)
   const [gifPreloaded, setGifPreloaded] = useState(false)
   const gifRef = useRef<HTMLImageElement>(null)
+  const invitationVideoRef = useRef<HTMLVideoElement>(null)
   const gifTimerRef = useRef<NodeJS.Timeout | null>(null)
   const { scrollYProgress } = useScroll()
+
   const pathY1 = useTransform(scrollYProgress, [0, 0.5], [0, 20])
   const pathY2 = useTransform(scrollYProgress, [0, 0.5], [0, 40])
 
@@ -240,6 +242,34 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
     }
   }, [introFinished]);
 
+  useEffect(() => {
+    if (!introFinished) return;
+
+    const video = invitationVideoRef.current;
+    if (!video) return;
+
+    try {
+      video.currentTime = 0;
+      video.load();
+      const playPromise = video.play();
+      playPromise?.catch(() => {});
+    } catch {
+    }
+  }, [introFinished]);
+
+  useEffect(() => {
+    if (!introFinished) return;
+    if (imageLoaded) return;
+
+    const timer = setTimeout(() => {
+      // Removed the video loader
+    }, 300)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [introFinished, imageLoaded])
+
   const handleImageLoad = () => {
     setImageLoaded(true)
     onImageLoad?.()
@@ -262,7 +292,7 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20 overflow-x-hidden pt-0">
       {/* Hero Section */}
       <motion.section
-        className="relative w-full overflow-hidden pt-0 -mt-4"
+        className="relative w-full overflow-hidden pt-0"
         initial="hidden"
         animate="visible"
         variants={fastStaggerContainer}
@@ -272,27 +302,19 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
           variants={scaleIn}
         >
           {introFinished && (
-            <div className="relative w-full pt-0">
+            <div className="video-container-fix" style={{ height: '100dvh', width: '100vw', position: 'relative', backgroundColor: 'black', overflow: 'hidden' }}>
               <video
                 key="invitation-video"
+                ref={invitationVideoRef}
                 src="/invitation-design.mp4"
-                className="w-full h-auto object-contain"
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
                 autoPlay
                 muted
                 playsInline
+                preload="auto"
                 onLoadedData={handleImageLoad}
-                poster="/invitation-design.png"
+                poster="/invitation-design.png?v=2"
               />
-
-              {/* Minimal loading state */}
-              {!imageLoaded && (
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-sm text-muted-foreground">{t('loading')}</span>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </motion.div>
@@ -300,36 +322,31 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
         <div className="mt-6 w-full max-w-2xl mx-auto text-center px-4">
         </div>
 
-        {/* Scroll Down Indicator - Flying from left */}
+        {/* Minimal Scroll Down Indicator - Center bottom */}
         <motion.button
           onClick={() => {
-            const countdownSection = document.querySelector('section[class*="py-12"]');
+            const countdownSection = document.querySelector('section[class*="pt-0"]') || document.querySelector('section[style*="countdown-bg.jpg"]');
             countdownSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
-          className="absolute bottom-14 left-2 flex flex-col items-center gap-3 z-20 cursor-pointer group"
-          initial="hidden"
-          animate="visible"
-          variants={flyFromLeft}
-          transition={{ delay: 0.8 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 cursor-pointer group"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2, duration: 1 }}
         >
-          <div className="bg-background/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border border-accent/30 group-hover:border-accent/50 transition-colors">
-            <span className="text-base md:text-lg text-foreground font-medium tracking-wide">
-              {language === 'ar' ? 'مرر للأسفل' : 'Scroll Down'}
-            </span>
-          </div>
+          <span className="text-[11px] uppercase tracking-[0.3em] text-white font-bold drop-shadow-md mb-1">
+            {language === 'ar' ? 'اسحب لأسفل' : 'Scroll'}
+          </span>
           <motion.div
-            animate={{ y: [0, 12, 0] }}
+            animate={{ y: [0, 5, 0] }}
             transition={{
-              duration: 1.2,
+              duration: 2,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="bg-accent/90 p-2 rounded-full shadow-lg group-hover:bg-accent transition-colors"
+            className="text-white drop-shadow-md group-hover:scale-110 transition-transform"
           >
             <svg
-              className="w-8 h-8 text-white"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -338,7 +355,7 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
               />
             </svg>
           </motion.div>
@@ -375,11 +392,6 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
       {/* Countdown Section */}
       <section
         className="relative pt-0 pb-8 px-4 md:pt-0 md:pb-12 overflow-hidden"
-        style={{
-          backgroundImage: "url('/countdown-bg.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
       >
         {/* Decorative Elements */}
         <div className="absolute top-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl z-0" />
@@ -387,7 +399,7 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
 
         <div className="relative max-w-6xl mx-auto text-center z-10">
           <div className="inline-flex flex-col items-center mb-16">
-            <h2 className="font-luxury text-5xl md:text-6xl lg:text-7xl text-foreground leading-tight mb-6 tracking-wide">
+            <h2 className="font-heading font-luxury text-5xl md:text-6xl lg:text-7xl text-foreground leading-tight mb-6 tracking-wide">
               {t('ourSpecialDay')}
             </h2>
             <p className="font-luxury text-3xl md:text-3xl lg:text-4xl font-bold max-w-3xl italic bg-clip-text text-transparent bg-gradient-to-br from-primary via-accent to-primary/60">
@@ -440,7 +452,7 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
                 transition={{ duration: 1.2, delay: 0.2 }}
               />
             </motion.div>
-            <motion.h2 className="font-luxury text-5xl md:text-6xl lg:text-7xl text-foreground leading-tight mb-4 tracking-wide" variants={floatFromRight}>
+            <motion.h2 className="font-heading font-luxury text-5xl md:text-6xl lg:text-7xl text-foreground leading-tight mb-4 tracking-wide" variants={floatFromRight}>
               {t('joinUsAt')}
             </motion.h2>
           </motion.div>
@@ -519,13 +531,13 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
 
                 {/* Venue Name */}
                 <motion.h3
-                  className="font-elegant text-4xl md:text-5xl lg:text-6xl text-foreground mb-2 tracking-wide"
+                  className="font-heading text-4xl md:text-5xl lg:text-6xl text-foreground mb-2 tracking-wide"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  {t('location').split(/[,،]\s*/)[0]}
+                  <span className="font-heading">{t('location').split(/[,،]\s*/)[0]}</span>
                 </motion.h3>
                 <motion.p
                   className="font-luxury text-xl md:text-2xl text-muted-foreground mb-8 italic"
@@ -588,22 +600,20 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
                     </p>
                   </motion.div>
                 </div>
+
+                {/* Map inside the same container */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-8"
+                >
+                  <VenueMap />
+                </motion.div>
               </div>
             </motion.div>
-
-            {/* Map in Separate Card Below */}
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 30 }}
-              whileInView={{ scale: 1, opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <VenueMap />
-            </motion.div>
-
-
           </div>
-
         </div>
       </motion.section>
 
@@ -623,7 +633,7 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
       >
         <div className="max-w-3xl mx-auto px-4">
           <motion.p
-            className="font-luxury text-3xl md:text-4xl text-foreground mb-8 italic leading-relaxed"
+            className="font-heading text-4xl md:text-6xl text-foreground mb-10 italic leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -631,7 +641,7 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
           >
             {t('footerMessage')}
           </motion.p>
-          <div className="flex items-center justify-center gap-6 mb-8">
+          <div className="flex items-center justify-center gap-6 mb-12">
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-accent to-accent" />
             <motion.span
               className="text-3xl text-accent drop-shadow-lg"
@@ -647,16 +657,23 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
             </motion.span>
             <div className="w-24 h-px bg-gradient-to-l from-transparent via-accent to-accent" />
           </div>
-          <div className="flex items-center justify-center gap-3 opacity-60">
-            <svg className="w-5 h-5 text-accent" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
-            <svg className="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
-            <svg className="w-5 h-5 text-accent" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
+
+          <div className="flex flex-row items-center justify-center gap-3">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-light whitespace-nowrap">
+              {t('madeBy')}
+            </span>
+            <a 
+              href="https://www.instagram.com/digitiva.co?igsh=MXNteGgyZjIzenQwaQ==" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="transition-all duration-300 hover:scale-105"
+            >
+              <img 
+                src="/digitiva.png" 
+                alt="Digitiva Logo" 
+                className="h-16 w-auto"
+              />
+            </a>
           </div>
         </div>
       </motion.footer>

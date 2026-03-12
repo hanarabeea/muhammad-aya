@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface VideoIntroProps {
   onComplete: () => void
@@ -9,38 +9,42 @@ interface VideoIntroProps {
 
 export default function VideoIntro({ onComplete, onSkip }: VideoIntroProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
-    // Simple autoplay attempt - let the browser handle it
-    const playVideo = () => {
-      video.play().catch(() => {
-        // Autoplay blocked - browser will handle it
-      });
-    };
-
-    // Try when video can play
-    if (video.readyState >= 3) {
-      playVideo();
-    } else {
-      video.addEventListener('canplay', playVideo, { once: true });
-    }
+    // Ensure the first frame/poster is available without starting playback
+    video.load();
   }, []);
+
+  const handleClick = () => {
+    if (started) return;
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    setStarted(true);
+    video.play().catch(() => {
+      // If playback fails (rare), allow another click attempt
+      setStarted(false);
+    });
+  };
 
   return (
     <div 
       className="fixed inset-0 bg-black flex items-center justify-center z-[9999]"
-      onClick={onSkip}
+      onClick={handleClick}
     >
       <div className="w-full h-full flex items-center justify-center bg-black">
         <video 
           ref={videoRef}
-          className="h-auto max-h-full w-auto max-w-full object-contain"
+          className="w-full h-full object-cover"
+          style={{ width: '100vw', height: '100dvh' }}
           playsInline={true}
           muted={true}
-          autoPlay={true}
+          autoPlay={false}
+          controls={false}
           onEnded={onComplete}
           preload="auto"
           disablePictureInPicture

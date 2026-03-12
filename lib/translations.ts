@@ -56,6 +56,7 @@ type TranslationKey =
   | 'current'
   | 'size'
   | 'copyright'
+  | 'madeBy'
   | 'sharePhotosTitle'
   | 'sharePhotosDescription'
   | 'uploadButton'
@@ -96,7 +97,7 @@ export const translations: Translations = {
   },
   location: {
     en: 'Laylaty Hall, Talkha, Mansoura, Egypt',
-    ar: 'قاعة ليالتي، طلخا، المنصورة، مصر',
+    ar: 'قاعة ليلتي، طلخا، المنصورة، مصر',
   },
   rsvpTitle: {
     en: 'Will You Join Us?',
@@ -223,7 +224,7 @@ export const translations: Translations = {
     ar: 'الرجاء إدخال الاسم وكتابة رسالة',
   },
   footerMessage: {
-    en: "can't wait to celebrate with you instead",
+    en: "can't wait to celebrate with you",
     ar: 'لا نطيق الانتظار للاحتفال معكم'
   },
   sendingMessage: {
@@ -287,8 +288,12 @@ export const translations: Translations = {
     ar: 'الحجم',
   },
   copyright: {
-    en: 'All Rights Reserved. Made by',
-    ar: 'جميع الحقوق محفوظة. صنع بواسطة',
+    en: 'All Rights Reserved.',
+    ar: 'جميع الحقوق محفوظة. ',
+  },
+  madeBy: {
+    en: 'Made by',
+    ar: 'صنع بواسطة',
   },
   sharePhotosTitle: {
     en: 'Share Your Photos From The Day',
