@@ -389,6 +389,22 @@ export default function ProAnimatedEngagementPage({ onImageLoad, introFinished }
         </div>
       </div>
 
+      <section className="relative px-4 pb-10 md:pb-14">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center">
+            <p className="font-heading text-2xl sm:text-3xl md:text-5xl text-foreground italic leading-relaxed whitespace-nowrap">
+              You are my today and all of my tomorrows.
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-4">
+              <div className="w-16 h-px bg-accent/30" />
+              <span className="text-accent">♥</span>
+              <div className="w-16 h-px bg-accent/30" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       {/* Countdown Section */}
       <section
         className="relative pt-0 pb-8 px-4 md:pt-0 md:pb-12 overflow-hidden"
