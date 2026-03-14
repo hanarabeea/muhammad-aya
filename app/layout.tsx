@@ -80,11 +80,18 @@ export default function RootLayout({
         <meta property="og:image" content="https://muhammad-aya.digitivaa.com/invitation-design.png" />
         <meta property="og:image:secure_url" content="https://muhammad-aya.digitivaa.com/invitation-design.png" />
         <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:width" content="768" />
-        <meta property="og:image:height" content="1365" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="Muhammad & Aya Wedding Invitation" />
         <meta property="og:site_name" content="Muhammad & Aya Wedding" />
         <meta property="og:locale" content="en_US" />
+
+        {/* WhatsApp specific tags */}
+        <meta property="og:image" content="https://muhammad-aya.digitivaa.com/invitation-design.png" />
+        <meta name="whatsapp:url" content="https://muhammad-aya.digitivaa.com/" />
+        <meta name="whatsapp:title" content="Muhammad & Aya - Wedding Celebration" />
+        <meta name="whatsapp:description" content="Join us in celebrating Muhammad & Aya's wedding" />
+        <meta name="whatsapp:image" content="https://muhammad-aya.digitivaa.com/invitation-design.png" />
 
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
