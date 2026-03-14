@@ -25,19 +25,19 @@ const greatVibes = Great_Vibes({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://muhammad_aya.digitivaa.com"),
+  metadataBase: new URL("https://muhammad-aya.digitivaa.com"),
   title: "Muhammad & Aya - Wedding Celebration",
   description: "Join us in celebrating Muhammad & Aya's wedding",
   generator: "Digitiva",
   openGraph: {
-    url: "https://muhammad_aya.digitivaa.com/",
+    url: "https://muhammad-aya.digitivaa.com/",
     type: "website",
     siteName: "Muhammad & Aya Wedding",
     title: "Muhammad & Aya - Wedding Celebration",
     description: "Join us in celebrating Muhammad & Aya's wedding",
     images: [
       {
-        url: "https://muhammad_aya.digitivaa.com/invitation-design.png?t=20241220v2",
+        url: "https://muhammad-aya.digitivaa.com/invitation-design.png",
         width: 768,
         height: 1365,
         alt: "Muhammad & Aya Wedding Invitation",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Muhammad & Aya - Wedding Celebration",
     description: "Join us in celebrating Muhammad & Aya's wedding",
-    images: ["https://muhammad_aya.digitivaa.com/invitation-design.png?t=20241220"],
+    images: ["https://muhammad-aya.digitivaa.com/invitation-design.png"],
   },
   icons: {
     icon: "/invitation-design.png",
@@ -73,12 +73,12 @@ export default function RootLayout({
           - Current: 768x1365px (portrait) - may work but not optimal
           - Format: PNG or JPEG (not WebP)
         */}
-        <meta property="og:url" content="https://muhammad_aya.digitivaa.com/" />
+        <meta property="og:url" content="https://muhammad-aya.digitivaa.com/" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Muhammad & Aya - Wedding Celebration" />
         <meta property="og:description" content="Join us in celebrating Muhammad & Aya's wedding" />
-        <meta property="og:image" content="https://muhammad_aya.digitivaa.com/invitation-design.png?t=20241220v2" />
-        <meta property="og:image:secure_url" content="https://muhammad_aya.digitivaa.com/invitation-design.png?t=20241220v2" />
+        <meta property="og:image" content="https://muhammad-aya.digitivaa.com/invitation-design.png" />
+        <meta property="og:image:secure_url" content="https://muhammad-aya.digitivaa.com/invitation-design.png" />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="768" />
         <meta property="og:image:height" content="1365" />
@@ -90,7 +90,7 @@ export default function RootLayout({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Muhammad & Aya - Wedding Celebration" />
         <meta name="twitter:description" content="Join us in celebrating Muhammad & Aya's wedding" />
-        <meta name="twitter:image" content="https://muhammad_aya.digitivaa.com/invitation-design.png?t=20241220v2" />
+        <meta name="twitter:image" content="https://muhammad-aya.digitivaa.com/invitation-design.png" />
 
         {/* Preload PNG with high priority to eliminate lag on Netlify */}
         <link
